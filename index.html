@@ -1,0 +1,650 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<script>
+  (function() {
+    var GA_ID = 'G-X8V292M9PZ';
+    var isLocalDev = ['localhost', '127.0.0.1', ''].includes(location.hostname);
+    if (isLocalDev) return;
+    try { if (/[?&]no_ga=0/.test(location.search)) localStorage.removeItem('no_ga'); if (/[?&]no_ga=1/.test(location.search)) localStorage.setItem('no_ga', '1'); if (localStorage.getItem('no_ga') === '1') return; } catch (e) {}
+    var gaQ = new URLSearchParams(location.search); if (gaQ.get('obs') === '1' || gaQ.get('no_ga') === '1') return;
+    var s = document.createElement('script');
+    s.async = true;
+    s.src = 'https://www.googletagmanager.com/gtag/js?id=' + GA_ID;
+    document.head.appendChild(s);
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){ dataLayer.push(arguments); }
+    gtag('js', new Date());
+    gtag('config', GA_ID);
+    document.addEventListener('click', function(e) {
+      var a = e.target && e.target.closest ? e.target.closest('a[href*="booth.pm"]') : null;
+      if (!a) return;
+      gtag('event', 'booth_click', { link_url: a.href, link_id: a.id || '', link_text: (a.textContent || '').trim().slice(0, 40) });
+    });
+  })();
+</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="ビンゴカードを無料で作成して印刷できるツール。数字のビンゴ(1〜75・列ごとの範囲)、言葉のビンゴ(人さがし・自己紹介ビンゴ)、手書き用の無地テンプレートに対応。3&#215;3〜5&#215;5、全部ちがう並びのカードを50枚まで、A4に1・2・4・6枚並べて印刷・PDF保存。クリスマス・ハロウィンの色とかざりつき、登録不要・スマホでも作れます。">
+<link rel="canonical" href="https://uuhai0625.github.io/bingo-card-maker/">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="ja_JP">
+<meta property="og:title" content="ビンゴカード作成ツール|数字・言葉・無地のビンゴカードを無料で作って印刷(テンプレート)">
+<meta property="og:description" content="ビンゴカードを無料で作成して印刷できるツール。数字のビンゴ(1〜75・列ごとの範囲)、言葉のビンゴ(人さがし・自己紹介ビンゴ)、手書き用の無地テンプレートに対応。3&#215;3〜5&#215;5、全部ちがう並びのカードを50枚まで、A4に1・2・4・6枚並べて印刷・PDF保存。クリスマス・ハロウィンの色とかざりつき、登録不要・スマホでも作れます。">
+<meta property="og:url" content="https://uuhai0625.github.io/bingo-card-maker/">
+<title>ビンゴカード作成ツール|数字・言葉・無地のビンゴカードを無料で作って印刷(テンプレート)</title>
+<style>
+  :root {
+    --bg: #fbf6f2;
+    --panel: #ffffff;
+    --border: #ecdcd0;
+    --field-border: #8a7262;
+    --text: #2d241f;
+    --muted: #65564c;
+    --accent: #c2410c;
+    --accent-dark: #8a2c07;
+    --soft: #fdeee4;
+    --ng: #b3261e;
+    --locked: #cdb8a8;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: "Hiragino Kaku Gothic ProN", "Yu Gothic", "Meiryo", sans-serif; background: var(--bg); color: var(--text); line-height: 1.7; }
+  header { background: linear-gradient(135deg, var(--accent), var(--accent-dark)); color: #fff; padding: 24px 20px 18px; text-align: center; }
+  header h1 { margin: 0 0 6px; font-size: 1.35rem; }
+  header p { margin: 0; font-size: .9rem; }
+  main { max-width: 1040px; margin: 0 auto; padding: 22px 16px 50px; }
+  main > * { min-width: 0; }
+  .layout { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 18px; align-items: start; }
+  .layout > div { min-width: 0; }
+  .layout > .col-pv { position: sticky; top: 12px; }
+  section.card { background: var(--panel); border: 1px solid var(--border); border-radius: 12px; padding: 18px 20px; margin-bottom: 18px; }
+  section.card h2 { margin: 0 0 6px; font-size: 1.05rem; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .desc { color: var(--muted); font-size: .84rem; margin: 0 0 12px; }
+  .fine { color: var(--muted); font-size: .8rem; margin: 8px 0 0; }
+  .badge { display: inline-block; font-size: .7rem; padding: 2px 8px; border-radius: 999px; background: #fff1cc; color: #7a5600; font-weight: bold; }
+  .hidden { display: none !important; }
+  label.field { display: block; margin-bottom: 12px; }
+  .lbl { font-size: .85rem; font-weight: bold; display: block; }
+  .hint { font-size: .78rem; color: var(--muted); font-weight: normal; display: block; margin-top: 2px; }
+  input[type=text], input[type=number], select, textarea { width: 100%; margin-top: 5px; padding: 8px 10px; min-height: 44px; border: 1px solid var(--field-border); border-radius: 8px; font-size: 1rem; font-family: inherit; background: #fff; color: var(--text); }
+  textarea { min-height: 150px; line-height: 1.5; resize: vertical; }
+  .row2 { display: flex; gap: 12px; }
+  .row2 > * { flex: 1; min-width: 0; }
+  label.check { display: flex; align-items: center; gap: 8px; min-height: 44px; font-size: .86rem; cursor: pointer; }
+  label.check input { width: 20px; height: 20px; margin: 0; flex-shrink: 0; }
+  .seg { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+  .seg label { min-height: 44px; display: flex; align-items: center; gap: 6px; border: 1px solid var(--field-border); border-radius: 8px; padding: 6px 12px; font-size: .86rem; cursor: pointer; background: #fff; }
+  .seg label.on { border-color: var(--accent); background: var(--soft); font-weight: bold; }
+  .seg label:focus-within { outline: 2px solid var(--accent); outline-offset: 1px; }
+  fieldset.plain { border: none; padding: 0; margin: 0 0 12px; min-width: 0; }
+  fieldset.plain legend { font-size: .85rem; font-weight: bold; padding: 0; margin-bottom: 5px; }
+  .btn-row { display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap; }
+  .btn { min-height: 44px; padding: 9px 16px; border-radius: 8px; font-size: .88rem; cursor: pointer; border: 1px solid var(--field-border); background: #fff; color: var(--text); font-family: inherit; }
+  .btn.primary { background: var(--accent); border-color: var(--accent); color: #fff; font-weight: bold; }
+  .btn.small { min-height: 40px; padding: 6px 12px; font-size: .82rem; }
+  .btn:disabled { opacity: .5; cursor: not-allowed; }
+  .btn:focus-visible { outline: 2px solid var(--accent-dark); outline-offset: 2px; }
+  .btn-row .btn { flex: 1; }
+  .status { font-size: .82rem; color: var(--muted); margin-top: 6px; min-height: 1.2em; }
+  .status.err, .err { color: var(--ng); font-weight: bold; }
+  .preview { border: 1px solid var(--border); border-radius: 8px; background: #f3ece6; padding: 14px; display: flex; justify-content: center; overflow: hidden; }
+  .preview .bcard { box-shadow: 0 2px 10px rgba(0,0,0,.12); }
+  .info { font-size: .84rem; margin-top: 8px; }
+  .guide { font-size: .86rem; }
+  .guide ul, .guide ol { padding-left: 1.3em; margin: 6px 0; }
+  .guide li { margin: 4px 0; }
+  .locked-panel { border: 1px dashed var(--locked); border-radius: 10px; padding: 16px; text-align: center; color: var(--muted); background: #fffaf7; }
+  .locked-panel .lead { color: var(--text); font-weight: bold; }
+  .locked-panel .feat-list { text-align: left; max-width: 600px; margin: 10px auto; font-size: .85rem; padding-left: 1.2em; }
+  .buy-btn { display: inline-block; margin-top: 8px; background: var(--accent-dark); color: #fff; font-weight: bold; padding: 11px 22px; border-radius: 999px; text-decoration: none; font-size: .9rem; }
+
+  /* ===== ビンゴカード(印刷と見本で共通。大きさはmm) ===== */
+  .bcard { --c1: #1f3a68; --c2: #e8eef8; --c3: #1f3a68; background: #fff; color: #222; border: 0.6mm solid var(--c1); border-radius: 2mm; padding: 3% 3% 2%; font-family: "Hiragino Kaku Gothic ProN", "Yu Gothic", "Meiryo", sans-serif; display: flex; flex-direction: column; }
+  .bcard .bt { text-align: center; font-weight: 900; color: var(--c1); line-height: 1.15; overflow: hidden; white-space: nowrap; text-overflow: clip; }
+  .bcard .bh { display: grid; text-align: center; font-weight: 900; color: #fff; line-height: 1.5; margin-top: 2%; }
+  .bcard .bh span { background: var(--c1); }
+  .bcard .bh span:first-child { border-top-left-radius: 1.2mm; }
+  .bcard .bh span:last-child { border-top-right-radius: 1.2mm; }
+  .bcard .bg { display: grid; border-left: 0.4mm solid var(--c1); border-top: 0.4mm solid var(--c1); margin-top: 2%; }
+  .bcard .bh + .bg { margin-top: 0; }
+  .bcard .cell { aspect-ratio: 1 / 1; border-right: 0.4mm solid var(--c1); border-bottom: 0.4mm solid var(--c1); display: flex; align-items: center; justify-content: center; text-align: center; font-weight: bold; line-height: 1.15; overflow: hidden; overflow-wrap: anywhere; padding: 4%; color: var(--c3); }
+  .bcard .cell.free { background: var(--c2); color: var(--c1); }
+  .bcard .cell.hit { background: #ffe066; box-shadow: inset 0 0 0 0.9mm #c2410c; }
+  .bcard .bf { display: flex; justify-content: space-between; color: #666; margin-top: 1.5%; line-height: 1.3; }
+  .bcard.t-xmas { --c1: #b3202a; --c2: #e6f4ea; --c3: #1d5e33; }
+  .bcard.t-halloween { --c1: #6b2fa3; --c2: #fff0e0; --c3: #c2410c; }
+  .bcard.t-wedding { --c1: #85661a; --c2: #fbf5e6; --c3: #5b4a1e; }
+  .bcard.t-birthday { --c1: #c23c72; --c2: #e8f6fb; --c3: #1f6a90; }
+  .bcard.t-party { --c1: #c0262c; --c2: #fff6d6; --c3: #8a5a00; }
+  .bcard.t-custom { --c1: var(--cc, #1f3a68); --c2: #f4f4f4; --c3: var(--cc, #1f3a68); }
+
+  #printArea .page { position: relative; overflow: hidden; break-after: page; page-break-after: always; display: grid; justify-content: center; align-content: center; }
+  #printArea .page:last-child { break-after: auto; page-break-after: auto; }
+  #printArea .slot { display: flex; align-items: center; justify-content: center; border: 0.2mm dashed #bbb; }
+  
+  footer { max-width: 1040px; margin: 0 auto; padding: 0 16px 40px; font-size: .8rem; color: var(--muted); }
+  footer a { color: var(--muted); }
+  @media screen { #printArea { display: none; } }
+  @media print {
+    body { background: #fff; }
+    body > *:not(#printArea) { display: none !important; }
+    .bcard { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  }
+  @media (max-width: 820px) {
+    .layout { grid-template-columns: minmax(0, 1fr); }
+    .layout > .col-pv { position: static; }
+  }
+  @media (max-width: 600px) {
+    .row2 { flex-direction: column; gap: 0; }
+    section.card { padding: 16px 14px; }
+  }
+</style>
+<!--ANSHIN_CSS_START--><style>:root{--anshin-w:1008px;--anshin-pad:16px}.anshin-strip,.anshin{box-sizing:border-box;width:min(var(--anshin-w),calc(100% - 2 * var(--anshin-pad)));margin-left:auto;margin-right:auto}.anshin-strip{list-style:none;margin-top:10px;margin-bottom:0;padding:0;display:flex;flex-wrap:wrap;gap:6px 8px;align-items:center;font-size:.8rem;line-height:1.5}.anshin-strip li{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border:1px solid rgba(20,120,90,.45);border-radius:999px;background:rgba(20,120,90,.07)}.anshin-strip li.anshin-more{border:0;background:none;padding:3px 2px}.anshin-strip a,.anshin a{color:inherit}.anshin{margin-top:18px;margin-bottom:18px;padding:14px 18px;border:1px solid rgba(20,120,90,.45);border-radius:10px;background:rgba(20,120,90,.05);font-size:.86rem;line-height:1.7}.anshin h2{font-size:1rem;margin:0 0 6px}.anshin p{margin:0 0 6px}.anshin ul{margin:0;padding-left:1.2em}.anshin li{margin:3px 0}.anshin details{margin-top:6px}.anshin summary{cursor:pointer;font-weight:bold}.anshin .anshin-meta{margin:8px 0 0;font-size:.8rem;opacity:.85}@media print{.anshin,.anshin-strip{display:none!important}}</style><!--ANSHIN_CSS_END-->
+</head>
+<body>
+
+<header>
+  <h1>ビンゴカードメーカー(無料のビンゴカード作成ツール)</h1>
+  <p>数字のビンゴも、言葉のビンゴも、手書き用の無地カードも。全部ちがう並びのカードを最大50枚まで作って、そのまま印刷できます。登録不要・スマホでも作れます</p>
+</header>
+<!--ANSHIN_STRIP_START-->
+<ul class="anshin-strip" aria-label="データの扱い">
+  <li><span aria-hidden="true">✓</span> 入力内容はこの端末の中だけで処理</li>
+  <li><span aria-hidden="true">✓</span> 登録・ログイン不要</li>
+  <li><span aria-hidden="true">✓</span> 仕組みを公開中</li>
+  <li class="anshin-more"><a href="#anshin">データの扱いをくわしく</a></li>
+</ul>
+<!--ANSHIN_STRIP_END-->
+
+<main>
+<div class="layout">
+<div>
+
+  <section class="card" id="kind-card">
+    <h2>① ビンゴの種類</h2>
+    <fieldset class="plain">
+      <legend>マスに入れるもの</legend>
+      <div class="seg">
+        <label class="on"><input type="radio" name="mode" value="num" checked data-save> 数字</label>
+        <label><input type="radio" name="mode" value="word" data-save> 言葉(お題・名前など)</label>
+        <label><input type="radio" name="mode" value="blank" data-save> 無地(手書き用)</label>
+      </div>
+    </fieldset>
+    <div class="row2">
+      <label class="field">
+        <span class="lbl">マスの数</span>
+        <select id="in-size" data-save>
+          <option value="3">3×3(子ども・少人数向け)</option>
+          <option value="4">4×4</option>
+          <option value="5" selected>5×5(ふつうのビンゴ)</option>
+        </select>
+      </label>
+      <label class="field" id="maxField">
+        <span class="lbl">数字は1から</span>
+        <input type="number" id="in-max" min="9" max="99" step="1" value="75" inputmode="numeric" data-save>
+        <span class="hint" id="maxHint">5×5は1〜75がふつうです</span>
+      </label>
+    </div>
+    <label class="check" id="splitField"><input type="checkbox" id="opt-split" checked data-save> 列ごとに数字の範囲を分ける(左の列から1〜15、16〜30…のふつうのビンゴ)</label>
+    <label class="check" id="freeField"><input type="checkbox" id="opt-free" checked data-save> まん中を「FREE」にする(はじめから開いているマス)</label>
+    <div id="wordFields" class="hidden">
+      <label class="field">
+        <span class="lbl">言葉(1行に1つ)</span>
+        <textarea id="in-words" maxlength="12000" data-save placeholder="例:&#10;犬を飼っている&#10;朝ごはんはパン派&#10;北海道に行ったことがある"></textarea>
+        <span class="hint" id="wordHint"></span>
+      </label>
+      <div class="btn-row" style="margin-top:0;">
+        <button type="button" class="btn small" id="sampleBtn">例を入れる(人さがしビンゴ)</button>
+      </div>
+    </div>
+  </section>
+
+  <section class="card" id="look-card">
+    <h2>② カードの見た目</h2>
+    <label class="field">
+      <span class="lbl">いちばん上の文字(タイトル)</span>
+      <input type="text" id="in-title" maxlength="24" value="BINGO" placeholder="例: 忘年会ビンゴ大会" data-save>
+    </label>
+    <label class="check" id="headField"><input type="checkbox" id="opt-head" checked data-save> マスの上に「B I N G O」を入れる(5×5のとき)</label>
+    <label class="field">
+      <span class="lbl">色とかざり</span>
+      <select id="in-theme" data-save>
+        <option value="simple">シンプル(紺・かざりなし)</option>
+        <option value="xmas">クリスマス(赤・緑・🎄)</option>
+        <option value="halloween">ハロウィン(紫・オレンジ・🎃)</option>
+        
+      </select>
+    </label>
+    
+  </section>
+
+  <section class="card" id="print-card">
+    <h2>③ 枚数と印刷</h2>
+    <div class="row2">
+      <label class="field">
+        <span class="lbl">カードの枚数</span>
+        <input type="number" id="in-count" min="1" max="50" step="1" value="20" inputmode="numeric" data-save>
+        <span class="hint" id="countHint">1〜50枚(全部ちがう並びになります)</span>
+      </label>
+      <label class="field">
+        <span class="lbl">A4 1枚に</span>
+        <select id="in-per" data-save>
+          <option value="1">1枚(大きく)</option>
+          <option value="2">2枚(A4横)</option>
+          <option value="4" selected>4枚</option>
+          <option value="6">6枚(A4横・小さめ)</option>
+        </select>
+      </label>
+    </div>
+    <div class="field" style="margin-bottom:12px;">
+      <label class="lbl" for="in-set">カードの組の番号(セット番号・数字6けたまで)</label>
+      <div class="row2" style="align-items:center;">
+        <input type="text" id="in-set" maxlength="6" inputmode="numeric" value="" aria-describedby="setHint" data-save>
+        <button type="button" class="btn small" id="newSetBtn" style="flex:0 0 auto;margin-top:5px;">別の並びにする</button>
+      </div>
+      <span class="hint" id="setHint">同じ設定とセット番号なら、何度作っても同じカードになります(印刷し直しても大丈夫)。カードの右下に、セット番号と設定の照合コードが入ります。</span>
+    </div>
+  </section>
+
+</div>
+<div class="col-pv">
+  <section class="card" id="result-card">
+    <h2>④ 見本と印刷</h2>
+    <div class="preview" id="preview"></div>
+    <div class="info" id="info" aria-live="polite"></div>
+    <div class="btn-row">
+      <button class="btn primary" type="button" id="printBtn">印刷する(PDF保存もここから)</button>
+    </div>
+    <div class="status" id="st" role="status"></div>
+    <p class="fine">印刷画面で「用紙サイズ: A4」「倍率: 100%(実際のサイズ)」にしてください。点線で切り分けます。PDFにしたいとき: パソコン・Androidはプリンターの選択で「PDFに保存」、iPhoneは印刷画面の共有ボタンから「"ファイル"に保存」。PDFはコンビニのプリントサービスでも印刷できます。</p>
+  </section>
+</div>
+</div>
+
+  <section class="card" id="pro-section">
+    <h2>抽選と当たり確認もこれ1つで <span class="badge">買い切り版 ¥100(税込)</span></h2>
+    <div class="locked-panel">
+      <p class="lead">カードを作るだけでなく、当日の抽選と「本当にビンゴ?」の確認まで。</p>
+      <p>このページの機能は無料でそのまま使えます。買い切り版(ダウンロード購入)では、次の機能が増えます:</p>
+      <ul class="feat-list">
+        <li><strong>カードを500枚まで</strong>(無料版は50枚まで)</li>
+        <li><strong>抽選画面</strong>: ボタンやキーボードで番号(言葉)を引いて大きく表示、全画面表示・出た番号の一覧つき。途中で閉じても続きから</li>
+        <li><strong>当たり確認</strong>: カードの番号を入れると、出た番号に色がついて「ビンゴ」「リーチ」が分かります</li>
+        <li><strong>色とかざりの追加</strong>: 結婚式・誕生日・忘年会/新年会・好きな色</li>
+        <li><strong>パソコンで使うHTMLファイルです</strong>(スマホでの動作は保証していません)。ダブルクリックで開くだけ、ネットにつながっていなくても使えます</li>
+      </ul>
+      <a class="buy-btn" href="https://uuhai0625.booth.pm/items/8960922" id="buyLink" target="_blank" rel="noopener">買い切り版を見る(BOOTH・新しいタブ)</a>
+    </div>
+  </section>
+
+  
+
+  <section class="card guide" id="guide">
+    <h2>ビンゴカードの作り方</h2>
+    <ol>
+      <li>①で「数字」「言葉」「無地(手書き用)」から選び、マスの数を決めます。言葉ビンゴは、1行に1つずつ言葉を入れます。</li>
+      <li>②でタイトルと色・かざりを選びます。</li>
+      <li>③で枚数(参加する人数分)と、A4 1枚に何枚並べるかを選びます。</li>
+      <li>「印刷する」で印刷し、点線で切り分けます。PDFに保存してコンビニで印刷することもできます。</li>
+    </ol>
+    <h2 style="margin-top:16px;">ビンゴカードのよくある疑問</h2>
+    <ul>
+      <li><strong>ふつうのビンゴの数字は何番まで?</strong> 5×5のビンゴでは1〜75がよく使われ、左の列から1〜15、16〜30、31〜45、46〜60、61〜75の範囲で並べます。このツールの初期設定もこの形です。</li>
+      <li><strong>カードが同じ並びにならない?</strong> 1回に作るカードは、全部ちがう並びになるようにしています。</li>
+      <li><strong>言葉ビンゴはいくつ言葉が必要?</strong> 5×5でまん中がFREEなら24個、3×3なら9個(まん中FREEなら8個)以上です。マスより多く入れると、カードごとに使う言葉も変わります。</li>
+      <li><strong>無地のビンゴカード</strong>: 「無地(手書き用)」を選ぶと、マスが空のカードを印刷できます。参加者が自分で数字や言葉を書き込むビンゴに使えます。</li>
+      <li><strong>人さがしビンゴ(自己紹介ビンゴ)</strong>: 「犬を飼っている」「〇〇に行ったことがある」などのお題を入れて、当てはまる人のサインをもらうゲームです。初対面の集まりや研修で使われます。出身地・家族・見た目など、答えにくいお題は避けると安心です。</li>
+      <li><strong>抽選は?</strong> 数字ビンゴは、市販のビンゴマシンや抽選アプリでも遊べます。</li>
+      <li><strong>景品について</strong>: 景品は主催者側で用意するのが安全です(参加者からお金を集めて景品にするのは避けましょう)。お店の販促として行う場合は、景品表示法の上限額に注意してください。</li>
+    </ul>
+  </section>
+
+</main>
+
+<!--ANSHIN_START-->
+<section class="anshin" id="anshin" aria-labelledby="anshin-title">
+  <h2 id="anshin-title">データの扱いについて</h2>
+  <p>このページには、入力した内容を受け取る仕組みがありません。入力した文字や数字は、あなたのスマホやパソコンの中だけで処理されます。</p>
+  <ul>
+    <li>会員登録・ログイン・メールアドレスの入力はありません。</li>
+    <li>自分で確かめたい方へ: ページを開いたあと機内モードにしても、そのまま使えます。</li>
+  </ul>
+  <details>
+    <summary>もっとくわしく(保存・アクセス解析・公開について)</summary>
+    <ul>
+      <li>保存されるデータは、この端末のこのブラウザの中にだけ残ります(localStorage)。共用のパソコンでは使い終わったら消してください。</li>
+      <li>アクセス解析(Google Analytics)のため、見たページのURL・参照元・端末やブラウザの種類・おおよその地域(IPアドレスから推定)・Cookieの識別子・BOOTHへのリンクのクリック・どのボタンを押したか(回数や選んだ設定を含む)がGoogleに送られます。目的は利用状況の把握です。入力した文字や画像は送りません。(<a href="https://policies.google.com/technologies/partner-sites?hl=ja" target="_blank" rel="noopener">Googleによるデータの使用</a>/<a href="https://tools.google.com/dlpage/gaoptout?hl=ja" target="_blank" rel="noopener">計測を止めるアドオン</a>。止めてもツールはそのまま使えます)</li>
+      <li>このツールの結果や作成物は目安です。入稿・契約・販売などの前には、印刷所や公式の情報でご確認ください。</li>
+      <li>処理の中身はすべて公開しています(詳しい方向け: <a href="https://github.com/uuhai0625/bingo-card-maker" target="_blank" rel="noopener">GitHub</a>)。</li>
+    </ul>
+  </details>
+  <p class="anshin-meta">作っている人: ウーハイ(個人開発)/不具合・ご質問は<a href="https://x.com/uuhai0625" target="_blank" rel="noopener">X(@uuhai0625)</a>へ/<a href="https://uuhai0625.github.io/" target="_blank" rel="noopener">ほかのツール</a>/この説明の更新日: 2026-10-09</p>
+</section>
+<!--ANSHIN_END-->
+
+<footer>
+  <p id="privacyNote">本ツールは完全にブラウザ内で動作し、入力した内容はどこにも送信されません。</p>
+  <p><a href="https://uuhai0625.booth.pm/" target="_blank" rel="noopener">他のツールも見る(BOOTHショップ)</a></p>
+  <p>不具合・ご要望は X <a href="https://x.com/uuhai0625" target="_blank" rel="noopener">@uuhai0625</a> まで。</p>
+  <p class="related-tools no-print">関連する無料ツール: <a href="https://uuhai0625.github.io/uchiwa-moji-maker/" target="_blank" rel="noopener">うちわ文字メーカー</a> ・ <a href="https://uuhai0625.github.io/banquet-seating-allergen/" target="_blank" rel="noopener">宴会配席表</a> ・ <a href="https://uuhai0625.github.io/#free-tools">ツール一覧</a></p>
+</footer>
+
+<div id="printArea"></div>
+
+<script>
+(function () {
+  "use strict";
+
+  var EDITION = "free"; // "full" で買い切り完全版
+
+  function track(name, params) {
+    if (!window.dataLayer) return;
+    (function () { window.dataLayer.push(arguments); })("event", name, params || {});
+  }
+  var $ = function (id) { return document.getElementById(id); };
+  function el(tag, attrs, text) {
+    var e = document.createElement(tag);
+    if (attrs) Object.keys(attrs).forEach(function (k) { if (k === "class") e.className = attrs[k]; else e.setAttribute(k, attrs[k]); });
+    if (text != null) e.textContent = text;
+    return e;
+  }
+  function setSt(id, msg, err) { var e = $(id); e.textContent = msg; e.classList.toggle("err", !!err); }
+
+  var MAX_COUNT = 50;
+  var LIMIT_NOTE = "無料版で作れるのは50枚までです(買い切り版は500枚まで)。";
+  var LAST_KEY = "bingo_last_v1";
+  var A4 = [210, 297], MARGIN = 8;
+  // A4 1枚の並べ方: [横向きか, 列, 行]
+  var PER = { "1": [false, 1, 1], "2": [true, 2, 1], "4": [false, 2, 2], "6": [true, 3, 2] };
+  var SAMPLE = ["犬を飼っている", "猫を飼っている", "朝ごはんはパン派", "朝ごはんはごはん派", "北海道に行ったことがある", "沖縄に行ったことがある", "楽器が弾ける", "傘を持ってきた", "最近本を読んだ", "今年の誕生日が過ぎた", "コーヒーより紅茶派", "辛いものが好き", "早起きが得意", "海より山派", "早寝派", "スポーツ部だった", "料理が好き", "最近映画を観た", "ラーメンが好き", "夏生まれ", "電車で来た", "スマホの機種がAndroid", "ゲームが好き", "絵を描くのが好き", "旅行の予定がある"];
+
+  // 買い切り版で差し替えるフック(無料版では何もしない)
+  var extendSettings = function (s) { return s; };
+  var markHits = null; // 当たり確認用
+
+  // ===== 乱数(セット番号とカード番号から毎回同じ並びを作る) =====
+  function hashStr(str) { var h = 2166136261; for (var i = 0; i < str.length; i++) { h ^= str.charCodeAt(i); h = Math.imul(h, 16777619); } return h >>> 0; }
+  function rng(seed) { return function () { seed |= 0; seed = seed + 0x6D2B79F5 | 0; var t = Math.imul(seed ^ seed >>> 15, 1 | seed); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+  function shuffle(a, r) { for (var i = a.length - 1; i > 0; i--) { var j = Math.floor(r() * (i + 1)); var t = a[i]; a[i] = a[j]; a[j] = t; } return a; }
+
+  // ===== 設定 =====
+  function intVal(id, def, min, max) {
+    var raw = String($(id).value).trim();
+    var v = raw === "" ? def : Math.round(Number(raw));
+    if (!isFinite(v)) v = def;
+    return Math.max(min, Math.min(max, v));
+  }
+  var wordNote = "";
+  function setNum() { return String($("in-set").value).replace(/[０-９]/g, function (c) { return String.fromCharCode(c.charCodeAt(0) - 0xFEE0); }).trim(); }
+  function radioVal(name) { var r = document.querySelector('input[name="' + name + '"]:checked'); return r ? r.value : ""; }
+  function wordList() {
+    var seen = new Set(), out = [];
+    wordNote = "";
+    String($("in-words").value || "").split(/\r?\n/).forEach(function (w) {
+      w = w.replace(/\s+/g, " ").trim();
+      if (Array.from(w).length > 30) { w = Array.from(w).slice(0, 30).join(""); wordNote = "30文字をこえる言葉は、31文字目から切っています。"; }
+      if (!w) return;
+      if (seen.has(w)) { wordNote += "同じ言葉は1つにまとめています。"; return; }
+      seen.add(w); out.push(w);
+    });
+    if (out.length > 300) wordNote += "301個目からは使っていません。";
+    return out.slice(0, 300);
+  }
+  function settings() {
+    var n = intVal("in-size", 5, 3, 5);
+    var s = {
+      mode: /^(word|blank)$/.test(radioVal("mode")) ? radioVal("mode") : "num",
+      n: n,
+      max: intVal("in-max", 15 * n, n * n, 99),
+      split: $("opt-split").checked,
+      free: n % 2 === 1 && $("opt-free").checked,
+      words: wordList(),
+      title: $("in-title").value.trim().slice(0, 24),
+      head: $("opt-head").checked,
+      theme: $("in-theme").value,
+      color: "",
+      count: intVal("in-count", 20, 1, MAX_COUNT),
+      per: PER[$("in-per").value] ? $("in-per").value : "4",
+      set: /^\d{1,6}$/.test(setNum()) ? setNum() : "",
+      setBad: !/^\d{1,6}$/.test(setNum())
+    };
+    s = extendSettings(s);
+    if (!/^(simple|xmas|halloween|wedding|birthday|party|custom)$/.test(s.theme)) s.theme = "simple";
+    s.need = n * n - (s.free ? 1 : 0);
+    // 列ごとに分けるには、各列に n 個以上の数字が要る
+    s.splitOK = s.mode === "num" && s.split && Math.floor(s.max / n) >= n;
+    s.showHead = n === 5 && s.head && (s.splitOK || s.mode === "blank");
+    // 設定の照合コード(カードに印字し、当たり確認で同じ設定か確かめる)
+    s.code = (genHash(s) % 46656).toString(36).toUpperCase().padStart(3, "0");
+    return s;
+  }
+  function problem(s) {
+    if (s.mode === "word" && s.words.length < s.need) return "言葉が足りません。あと" + (s.need - s.words.length) + "個入れてください(" + s.n + "×" + s.n + (s.free ? "・FREEあり" : "") + "は" + s.need + "個以上)。";
+    if (s.mode === "num" && s.max < s.need) return "数字の範囲が狭すぎます(" + s.need + "以上にしてください)。";
+    if (s.setBad) return "セット番号は数字6けたまでで入れてください(「別の並びにする」でも決められます)。";
+    return "";
+  }
+
+  // ===== カードを作る =====
+  // 1枚分: 長さ n*n の配列(FREEは null)
+  function makeCard(s, r) {
+    var n = s.n, cells = [], c, i;
+    if (s.mode === "blank") {
+      for (i = 0; i < s.need; i++) cells.push("");
+    } else if (s.mode === "word") {
+      cells = shuffle(s.words.slice(), r).slice(0, s.need);
+    } else if (s.splitOK) {
+      var w = Math.floor(s.max / n), cols = [];
+      for (c = 0; c < n; c++) {
+        var lo = c * w + 1, hi = c === n - 1 ? s.max : (c + 1) * w, pool = [];
+        for (i = lo; i <= hi; i++) pool.push(i);
+        cols.push(shuffle(pool, r).slice(0, n));
+      }
+      for (var row = 0; row < n; row++) for (c = 0; c < n; c++) cells.push(cols[c][row]);
+      if (s.free) cells.splice(Math.floor(n * n / 2), 1);
+    } else {
+      var all = [];
+      for (i = 1; i <= s.max; i++) all.push(i);
+      cells = shuffle(all, r).slice(0, s.need);
+    }
+    if (s.free) cells.splice(Math.floor(n * n / 2), 0, null);
+    return cells;
+  }
+  // count 枚(全部ちがう並び)。同じ設定とセット番号なら毎回同じになる
+  function genHash(s) { return hashStr([s.mode, s.n, s.mode === "num" ? s.max : "", s.splitOK, s.free, s.mode === "word" ? s.words.join("\n") : "", s.set].join("|")); }
+  function makeCards(s, count) {
+    var out = [], seen = new Set(), tries = 0, r = rng(genHash(s)), cells;
+    if (s.mode === "blank") { cells = makeCard(s, r); for (var i = 0; i < count; i++) out.push(cells); return out; } // 無地は全部同じ
+    while (out.length < count && tries < count * 50) {
+      tries++;
+      cells = makeCard(s, r);
+      var key = cells.join("\u0001");
+      if (seen.has(key)) continue;
+      seen.add(key); out.push(cells);
+    }
+    return out;
+  }
+
+  // ===== カードのDOM(印刷と見本で共通。w は mm) =====
+  function fitSize(text, cellMm) {
+    var len = Array.from(String(text)).length;
+    var k = len <= 2 ? 0.42 : len <= 3 ? 0.27 : len <= 4 ? 0.21 : len <= 6 ? 0.2 : len <= 9 ? 0.17 : len <= 16 ? 0.135 : 0.11;
+    return cellMm * k;
+  }
+  function cardEl(s, cells, no, w) {
+    var n = s.n, card = el("div", { class: "bcard t-" + s.theme });
+    if (s.theme === "custom" && s.color) card.style.setProperty("--cc", s.color);
+    card.style.width = w + "mm";
+    var cellMm = w * 0.94 / n;
+    var deco = { xmas: "🎄", halloween: "🎃", wedding: "💍", birthday: "🎂", party: "🎉" }[s.theme] || "";
+    if (s.title) {
+      var tt = deco ? deco + " " + s.title + " " + deco : s.title;
+      var t = el("div", { class: "bt" }, tt);
+      t.style.fontSize = Math.min(w * 0.1, w * 0.88 / (Array.from(s.title).length + (deco ? 2.6 : 0))) + "mm";
+      card.appendChild(t);
+    }
+    if (s.showHead) {
+      var h = el("div", { class: "bh" });
+      h.style.gridTemplateColumns = "repeat(" + n + ", 1fr)";
+      h.style.fontSize = (cellMm * 0.42) + "mm";
+      "BINGO".split("").forEach(function (ch) { h.appendChild(el("span", null, ch)); });
+      card.appendChild(h);
+    }
+    var g = el("div", { class: "bg" });
+    g.style.gridTemplateColumns = "repeat(" + n + ", 1fr)";
+    cells.forEach(function (v, i) {
+      var c = el("div", { class: "cell" + (v === null ? " free" : "") }, v === null ? "FREE" : String(v));
+      c.style.fontSize = (v === null ? cellMm * 0.24 : fitSize(v, cellMm)) + "mm";
+      if (markHits && (v === null || markHits(v))) c.classList.add("hit");
+      g.appendChild(c);
+    });
+    card.appendChild(g);
+    var f = el("div", { class: "bf" });
+    f.style.fontSize = Math.max(2.2, w * 0.03) + "mm";
+    f.appendChild(el("span", null, s.mode === "num" ? "1〜" + s.max : s.mode === "word" ? s.words.length + "語から" : (deco || "")));
+    f.appendChild(el("span", null, s.mode === "blank" ? "" : "No." + String(no).padStart(3, "0") + "  セット" + s.set + "-" + s.code));
+    card.appendChild(f);
+    return card;
+  }
+  // カードの高さ(mm)のおおよそ: 幅に対する比
+  function cardRatio(s) { return 0.06 + (s.title ? 0.12 : 0) + (s.showHead ? 0.14 : 0) + 1 + 0.07; }
+  function cardWidth(s) {
+    var p = PER[s.per], pw = p[0] ? A4[1] : A4[0], ph = p[0] ? A4[0] : A4[1];
+    var sw = (pw - 2 * MARGIN) / p[1], sh = (ph - 2 * MARGIN) / p[2];
+    return Math.floor(Math.min(sw - 6, (sh - 6) / cardRatio(s)));
+  }
+
+  // ===== 画面 =====
+  function syncSeg() { document.querySelectorAll(".seg input[type=radio]").forEach(function (r) { var l = r.closest("label"); if (l) l.classList.toggle("on", r.checked); }); }
+  function syncUI(s) {
+    var num = s.mode === "num";
+    $("maxField").classList.toggle("hidden", !num);
+    $("splitField").classList.toggle("hidden", !num);
+    $("headField").classList.toggle("hidden", !(s.n === 5 && s.mode !== "word"));
+    $("freeField").classList.toggle("hidden", s.n % 2 === 0);
+    $("wordFields").classList.toggle("hidden", s.mode !== "word");
+    $("maxHint").textContent = s.n === 5 ? "5×5は1〜75がふつうです" : s.n + "×" + s.n + "なら1〜" + 15 * s.n + "くらいがおすすめです";
+    if (s.mode === "word") $("wordHint").textContent = s.words.length + "個入っています(" + s.need + "個以上必要)。" + wordNote;
+    syncExtra(s);
+  }
+  var syncExtra = function () {};
+  var lastCards = null;
+  function render() {
+    var s = settings();
+    syncUI(s); saveLast();
+    var pv = $("preview"), info = $("info");
+    pv.innerHTML = ""; info.textContent = "";
+    var err = problem(s);
+    $("printBtn").disabled = !!err;
+    if (err) { info.appendChild(el("span", { class: "err" }, err)); lastCards = null; return; }
+    var cards = makeCards(s, s.count);
+    lastCards = { s: s, cards: cards };
+    var box = pv.clientWidth - 30 || 300, wmm = Math.min(110, box / 3.78);
+    pv.appendChild(cardEl(s, cards[0], 1, wmm));
+    var pages = Math.ceil(cards.length / Number(s.per));
+    var msg = (s.mode === "blank" ? "無地のカード(全部同じ)を" : "見本は1枚目です。") + cards.length + "枚(A4 " + pages + "ページ、1枚の幅 約" + (cardWidth(s) / 10).toFixed(1) + "cm)を印刷します。";
+    if (cards.length < s.count) msg += " 並びの種類が少ないため、ちがう並びは" + cards.length + "枚までしか作れませんでした(数字の範囲や言葉を増やしてください)。";
+    if (s.mode === "word" && Number(s.per) >= 4 && s.words.some(function (x) { return Array.from(x).length > 12; })) msg += " 12文字より長い言葉は、A4に4枚以上並べると文字が小さくなります。1枚か2枚並べがおすすめです。";
+    info.textContent = msg;
+  }
+  var rTimer = null;
+  function onSetting() { clearTimeout(rTimer); rTimer = setTimeout(render, 120); }
+
+  // ===== 印刷 =====
+  var pageStyle = null;
+  $("printBtn").addEventListener("click", function () {
+    if (!lastCards) return;
+    var s = lastCards.s, cards = lastCards.cards, p = PER[s.per], per = p[1] * p[2];
+    var pw = p[0] ? A4[1] : A4[0], ph = p[0] ? A4[0] : A4[1], w = cardWidth(s);
+    var area = $("printArea");
+    area.innerHTML = "";
+    if (!pageStyle) { pageStyle = el("style"); document.head.appendChild(pageStyle); }
+    pageStyle.textContent = "@page { size: A4 " + (p[0] ? "landscape" : "portrait") + "; margin: 0; } #printArea .page { width: " + pw + "mm; height: " + ph + "mm; padding: " + MARGIN + "mm; grid-template-columns: repeat(" + p[1] + ", " + ((pw - 2 * MARGIN) / p[1]) + "mm); grid-template-rows: repeat(" + p[2] + ", " + ((ph - 2 * MARGIN) / p[2]) + "mm); }";
+    for (var i = 0; i < cards.length; i += per) {
+      var page = el("div", { class: "page" });
+      for (var j = 0; j < per; j++) {
+        var slot = el("div", { class: "slot" });
+        if (cards[i + j]) slot.appendChild(cardEl(s, cards[i + j], i + j + 1, w));
+        page.appendChild(slot);
+      }
+      area.appendChild(page);
+    }
+    setSt("st", "印刷画面を開きました。用紙A4・倍率100%にしてください。");
+    track("bingo_print", { count: cards.length, mode: s.mode, size: s.n, per: s.per });
+    setTimeout(function () { window.print(); }, 50);
+  });
+  window.addEventListener("afterprint", function () { $("printArea").innerHTML = ""; });
+
+  // ===== 設定の記憶(このブラウザだけ) =====
+  function snapshot() {
+    var o = {};
+    document.querySelectorAll("[data-save]").forEach(function (e) {
+      if (e.type === "radio") { if (e.checked) o[e.name] = e.value; }
+      else if (e.type === "checkbox") o[e.id] = e.checked;
+      else o[e.id] = e.value;
+    });
+    return o;
+  }
+  function applySnap(o) {
+    if (!o || typeof o !== "object") return;
+    var names = {};
+    document.querySelectorAll("[data-save]").forEach(function (e) {
+      if (e.type === "radio") { names[e.name] = true; if (typeof o[e.name] === "string") e.checked = e.value === o[e.name]; }
+      else if (e.type === "checkbox") { if (typeof o[e.id] === "boolean") e.checked = o[e.id]; }
+      else if (typeof o[e.id] === "string") {
+        var v = o[e.id].slice(0, e.tagName === "TEXTAREA" ? 12000 : 40);
+        if (e.tagName === "SELECT" && ![].some.call(e.options, function (op) { return op.value === v; })) return;
+        if (e.type === "color" && !/^#[0-9a-f]{6}$/i.test(v)) return;
+        e.value = v;
+      }
+    });
+    Object.keys(names).forEach(function (n) {
+      if (!document.querySelector('input[name="' + n + '"]:checked')) { var first = document.querySelector('input[name="' + n + '"]'); if (first) first.checked = true; }
+    });
+    syncSeg();
+  }
+  var saveTimer = null;
+  function saveLast() {
+    clearTimeout(saveTimer);
+    saveTimer = setTimeout(function () { try { localStorage.setItem(LAST_KEY, JSON.stringify(snapshot())); } catch (e) {} }, 300);
+  }
+  function newSet() { $("in-set").value = String(1000 + Math.floor(Math.random() * 9000)); }
+  try { applySnap(JSON.parse(localStorage.getItem(LAST_KEY) || "null")); } catch (e) {}
+  if (!/^\d{1,6}$/.test($("in-set").value.trim())) newSet();
+
+  var prevSize = $("in-size").value;
+  document.querySelectorAll("[data-save]").forEach(function (e) {
+    e.addEventListener(e.type === "text" || e.type === "number" || e.tagName === "TEXTAREA" || e.type === "color" ? "input" : "change", function () {
+      if (e.type === "radio") syncSeg();
+      if (e.id === "in-size" && e.value !== prevSize) {
+        // マスの数を変えたら、数字の範囲とFREEをその大きさのふつうの値にする
+        prevSize = e.value; $("in-max").value = String(15 * Number(e.value)); $("opt-free").checked = e.value === "5";
+      }
+      onSetting();
+    });
+    if (e.type === "number") e.addEventListener("change", function () {
+      // 入れ終わったら、実際に使う値(範囲内)に直して見せる
+      var n = Number($("in-size").value) || 5, min = e.id === "in-max" ? n * n : Number(e.min);
+      var v = intVal(e.id, Number(e.defaultValue), min, e.id === "in-count" ? MAX_COUNT : Number(e.max));
+      if (e.id === "in-count" && Number(e.value) > MAX_COUNT) setSt("st", LIMIT_NOTE, true);
+      e.value = String(v); onSetting();
+    });
+  });
+  $("newSetBtn").addEventListener("click", function () { newSet(); onSetting(); });
+  $("in-set").addEventListener("change", function () { if (/^\d{1,6}$/.test(setNum())) $("in-set").value = setNum(); onSetting(); });
+  $("sampleBtn").addEventListener("click", function () {
+    if ($("in-words").value.trim() && !confirm("入っている言葉を、例と入れ替えますか?")) return;
+    $("in-words").value = SAMPLE.join("\n"); onSetting();
+  });
+
+  
+
+  if (EDITION !== "full") {
+    $("privacyNote").innerHTML = '入力した内容はどこにも送信されません(すべてこのブラウザの中で処理します)。このページでは利用状況の把握のためにアクセス解析(Google Analytics)を使っています。<a href="https://policies.google.com/technologies/partner-sites?hl=ja" target="_blank" rel="noopener">Googleによるデータの使用について</a>';
+  }
+  window.addEventListener("resize", onSetting);
+  render();
+})();
+</script>
+</body>
+</html>
